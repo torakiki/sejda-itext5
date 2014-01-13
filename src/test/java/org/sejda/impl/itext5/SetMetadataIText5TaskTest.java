@@ -1,5 +1,5 @@
 /*
- * Created on 11/gen/2014
+ * Created on 13/gen/2014
  * Copyright 2014 by Andrea Vacondio (andrea.vacondio@gmail.com).
  * This file is part of sejda-itext5.
  *
@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,60 +32,60 @@ import org.sejda.core.context.SejdaContext;
 import org.sejda.core.service.DefaultTaskExecutionService;
 import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
-import org.sejda.model.parameter.RotateParameters;
+import org.sejda.model.parameter.SetMetadataParameters;
+import org.sejda.model.pdf.PdfMetadataKey;
 import org.sejda.model.pdf.PdfVersion;
-import org.sejda.model.rotation.PageRotation;
-import org.sejda.model.rotation.Rotation;
-import org.sejda.model.rotation.RotationType;
 import org.sejda.model.task.Task;
 
 import com.itextpdf.text.pdf.PdfReader;
 
 /**
- * Rotate task test for the itext implementation
- * 
  * @author Andrea Vacondio
- * 
+ *
  */
-public class RotateIText5TaskTest extends BaseTaskTest {
-
+public class SetMetadataIText5TaskTest extends BaseTaskTest {
     private DefaultTaskExecutionService victim = new DefaultTaskExecutionService();
     private SejdaContext context = mock(DefaultSejdaContext.class);
-    private RotateParameters parameters = new RotateParameters(PageRotation.createMultiplePagesRotation(
-            Rotation.DEGREES_180, RotationType.ALL_PAGES));
-    private Task<RotateParameters> victimTask = new RotateTask();
+    private SetMetadataParameters parameters = new SetMetadataParameters();
+    private Task<SetMetadataParameters> victimTask = new SetMetadataTask();
 
     @Before
-    public void setUp() throws SecurityException, IllegalArgumentException {
+    public void setUp() throws SecurityException, IllegalArgumentException, IOException {
         TestUtils.setProperty(victim, "context", context);
         parameters.setCompress(true);
-        parameters.setOutputPrefix("test_prefix_");
+        parameters.setOutputName("outName.pdf");
         parameters.setVersion(PdfVersion.VERSION_1_6);
+        parameters.put(PdfMetadataKey.AUTHOR, "test_author");
+        parameters.put(PdfMetadataKey.KEYWORDS, "test_keywords");
+        parameters.put(PdfMetadataKey.SUBJECT, "test_subject");
+        parameters.put(PdfMetadataKey.TITLE, "test_title");
         parameters.setOverwrite(true);
-        parameters.setOutput(getOutput());
+        parameters.setOutput(getOutputFile());
     }
-
 
     @Test
     public void testExecute() throws TaskException, IOException {
-        parameters.addSource(getSource());
+        parameters.setSource(getSource());
         doExecute();
     }
 
     @Test
     public void testExecuteEncrypted() throws TaskException, IOException {
-        parameters.addSource(getEncryptedSource());
+        parameters.setSource(getEncryptedSource());
         doExecute();
     }
 
     private void doExecute() throws TaskException, IOException {
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
-        PdfReader reader = getReaderFromResultStream("test_prefix_test_file.pdf");
+        PdfReader reader = getReaderFromResultFile();
         assertCreator(reader);
         assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
-        assertEquals(4, reader.getNumberOfPages());
-        assertEquals(180, reader.getPageRotation(2));
+        Map<String, String> meta = reader.getInfo();
+        assertEquals("test_author", meta.get(PdfMetadataKey.AUTHOR.getKey()));
+        assertEquals("test_keywords", meta.get(PdfMetadataKey.KEYWORDS.getKey()));
+        assertEquals("test_subject", meta.get(PdfMetadataKey.SUBJECT.getKey()));
+        assertEquals("test_title", meta.get(PdfMetadataKey.TITLE.getKey()));
         reader.close();
     }
 }
