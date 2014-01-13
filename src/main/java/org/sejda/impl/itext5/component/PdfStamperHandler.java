@@ -176,14 +176,16 @@ public final class PdfStamperHandler implements Closeable {
     }
 
     /**
-     * adds the viewer preference to the stamper
+     * adds the viewer preferences to the stamper
      * 
      * @see PdfStamper#addViewerPreference(PdfName, PdfObject)
-     * @param key
-     * @param value
+     * @param preferences
+     *            a map of preferences with corresponding value to be set on the documents
      */
-    public void addViewerPreference(PdfName key, PdfObject value) {
-        stamper.addViewerPreference(key, value);
+    public void addViewerPreferences(Map<PdfName, PdfObject> preferences) {
+        for (Entry<PdfName, PdfObject> entry : preferences.entrySet()) {
+            stamper.addViewerPreference(entry.getKey(), entry.getValue());
+        }
     }
 
     /**

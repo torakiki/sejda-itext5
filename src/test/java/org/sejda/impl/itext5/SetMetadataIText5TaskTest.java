@@ -50,7 +50,7 @@ public class SetMetadataIText5TaskTest extends BaseTaskTest {
     private Task<SetMetadataParameters> victimTask = new SetMetadataTask();
 
     @Before
-    public void setUp() throws SecurityException, IllegalArgumentException, IOException {
+    public void setUp() throws IOException {
         TestUtils.setProperty(victim, "context", context);
         parameters.setCompress(true);
         parameters.setOutputName("outName.pdf");
