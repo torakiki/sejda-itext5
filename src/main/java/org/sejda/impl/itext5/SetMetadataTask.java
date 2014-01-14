@@ -70,7 +70,7 @@ public class SetMetadataTask extends BaseTask<SetMetadataParameters> {
         File tmpFile = createTemporaryPdfBuffer();
         LOG.debug("Created output temporary buffer {} ", tmpFile);
         stamperHandler = new PdfStamperHandler(reader, tmpFile, parameters.getVersion());
-        stamperHandler.setCompression(parameters.isCompress());
+        stamperHandler.setCompression(parameters.isCompress(), reader);
 
         LOG.debug("Setting metadata on temporary document.");
         stamperHandler.setMetadata(parameters.entrySet());

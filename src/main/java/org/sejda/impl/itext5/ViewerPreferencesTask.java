@@ -97,7 +97,7 @@ public class ViewerPreferencesTask extends BaseTask<ViewerPreferencesParameters>
             File tmpFile = createTemporaryPdfBuffer();
             LOG.debug("Created output temporary buffer {} ", tmpFile);
             stamperHandler = new PdfStamperHandler(reader, tmpFile, parameters.getVersion());
-            stamperHandler.setCompression(parameters.isCompress());
+            stamperHandler.setCompression(parameters.isCompress(), reader);
             // set mode and layout
             stamperHandler.setViewerPreferences(preferences);
             // set other preferences

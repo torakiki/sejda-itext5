@@ -52,7 +52,7 @@ public class SetMetadataIText5TaskTest extends BaseTaskTest {
     @Before
     public void setUp() throws IOException {
         TestUtils.setProperty(victim, "context", context);
-        parameters.setCompress(true);
+        parameters.setCompress(false);
         parameters.setOutputName("outName.pdf");
         parameters.setVersion(PdfVersion.VERSION_1_6);
         parameters.put(PdfMetadataKey.AUTHOR, "test_author");

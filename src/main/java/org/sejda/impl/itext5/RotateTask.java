@@ -78,8 +78,7 @@ public class RotateTask extends BaseTask<RotateParameters> {
             File tmpFile = createTemporaryPdfBuffer();
             LOG.debug("Created output temporary buffer {} ", tmpFile);
             stamperHandler = new PdfStamperHandler(reader, tmpFile, parameters.getVersion());
-
-            stamperHandler.setCompression(parameters.isCompress());
+            stamperHandler.setCompression(parameters.isCompress(), reader);
 
             nullSafeCloseQuietly(stamperHandler);
             nullSafeClosePdfReader(reader);

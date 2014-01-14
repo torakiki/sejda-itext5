@@ -96,13 +96,19 @@ public final class PdfStamperHandler implements Closeable {
      * @throws TaskException
      * @throws DocumentException
      */
-    public void setCompression(boolean compress) throws TaskException {
+    public void setCompression(boolean compress, PdfReader reader) throws TaskException {
         if (compress) {
             try {
-                stamper.setFullCompression();
                 stamper.getWriter().setCompressionLevel(PdfStream.BEST_COMPRESSION);
+                int total = reader.getNumberOfPages() + 1;
+                for (int i = 1; i < total; i++) {
+                    reader.setPageContent(i, reader.getPageContent(i));
+                }
+                stamper.setFullCompression();
             } catch (DocumentException de) {
                 throw new TaskException("Unable to set compression on stamper", de);
+            } catch (IOException e) {
+                throw new TaskException("Unable to set compression on stamper", e);
             }
         }
     }
