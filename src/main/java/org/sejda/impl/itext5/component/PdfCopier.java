@@ -19,8 +19,8 @@
 package org.sejda.impl.itext5.component;
 
 import java.io.Closeable;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.exception.TaskIOException;
@@ -59,7 +59,7 @@ public interface PdfCopier extends Closeable {
      * @param reader
      *            the reader to use to get page size and rotation.
      */
-    void addBlankPage(PdfReader reader);
+    void addBlankPage(PdfReader reader) throws TaskException;
 
     /**
      * Adds a blank page to the current underlying document if the total number of written pages is odd.
@@ -67,14 +67,14 @@ public interface PdfCopier extends Closeable {
      * @param reader
      *            the reader to use to get page size and rotation.
      */
-    void addBlankPageIfOdd(PdfReader reader);
+    void addBlankPageIfOdd(PdfReader reader) throws TaskException;
 
     /**
      * Enables compression of the xref streams if compress is true.
      * 
      * @param compress
      */
-    void setCompression(boolean compress);
+    void setCompression(boolean compress) throws TaskException;
 
     /**
      * sets the input page labels to the underlying pdf copy.
@@ -97,7 +97,7 @@ public interface PdfCopier extends Closeable {
      * @param outline
      */
     // TODO investigate if it's still the case with iText5
-    void setOutline(List<Map<String, Object>> outline);
+    void setOutline(List<HashMap<String, Object>> outline);
 
     /**
      * @return the number of pages this copier has copied
