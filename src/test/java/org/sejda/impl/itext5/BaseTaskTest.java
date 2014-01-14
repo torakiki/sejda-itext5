@@ -58,6 +58,11 @@ class BaseTaskTest {
         return PdfStreamSource.newInstanceNoPassword(stream, "test_file.pdf");
     }
 
+    PdfStreamSource getMediumSource() {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("pdf/medium_test.pdf");
+        return PdfStreamSource.newInstanceNoPassword(stream, "test_file.pdf");
+    }
+
     PdfStreamSource getEncryptedSource() {
         InputStream stream = getClass().getClassLoader().getResourceAsStream("pdf/enc_with_modify_perm.pdf");
         return PdfStreamSource.newInstanceWithPassword(stream, "test_file.pdf", "test");
