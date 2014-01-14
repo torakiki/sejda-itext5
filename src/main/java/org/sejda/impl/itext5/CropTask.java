@@ -76,6 +76,7 @@ public class CropTask extends BaseTask<CropParameters> {
 
         copier = new DefaultPdfCopier(reader, tmpFile, parameters.getVersion());
         copier.setCompression(parameters.isCompress());
+        copier.open();
 
         Set<PdfRectangle> cropAreas = getPdfRectangles(parameters.getCropAreas());
         for (int page = 1; page <= totalPages; page++) {
@@ -85,6 +86,7 @@ public class CropTask extends BaseTask<CropParameters> {
             }
             notifyEvent(getNotifiableTaskMetadata()).stepsCompleted(page).outOf(totalPages);
         }
+        copier.freeReader(reader);
         nullSafeCloseQuietly(copier);
         nullSafeClosePdfReader(reader);
 

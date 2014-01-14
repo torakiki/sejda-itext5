@@ -29,12 +29,17 @@ import com.itextpdf.text.pdf.PdfPageLabels;
 import com.itextpdf.text.pdf.PdfReader;
 
 /**
- * Provides functionalities to copy pages from a given {@link PdfReader}.
+ * Provides functionalities to copy pages from a given {@link PdfReader}. Users must take care of opening and closing this component.
  * 
  * @author Andrea Vacondio
  * 
  */
 public interface PdfCopier extends Closeable {
+
+    /**
+     * Opens the underlying document. From this point pages can be added while other operations might be forbidden (setCompression, etc).
+     */
+    void open();
 
     /**
      * Adds the given page extracted from the input reader.

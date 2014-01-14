@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.sejda.impl.itext5.util.ITextUtils;
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.pdf.PdfVersion;
 
@@ -56,20 +57,21 @@ public class DefaultPdfCopierTest {
     public void testCount() throws IOException, TaskException {
         PdfReader reader = null;
         InputStream inputStream = null;
+        DefaultPdfCopier victim = null;
         try {
             inputStream = getClass().getClassLoader().getResourceAsStream("pdf/test_file.pdf");
             reader = new PdfReader(inputStream);
             reader.selectPages("2-3");
-            DefaultPdfCopier victim = new DefaultPdfCopier(reader, outFile, PdfVersion.VERSION_1_5);
+            victim = new DefaultPdfCopier(reader, outFile, PdfVersion.VERSION_1_5);
+            victim.open();
             victim.addAllPages(reader);
             assertEquals(2, victim.getNumberOfCopiedPages());
             victim.addBlankPage(reader);
             assertEquals(3, victim.getNumberOfCopiedPages());
         } finally {
             IOUtils.closeQuietly(inputStream);
-            if (reader != null) {
-                reader.close();
-            }
+            IOUtils.closeQuietly(victim);
+            ITextUtils.nullSafeClosePdfReader(reader);
         }
     }
 

@@ -52,7 +52,7 @@ public class DefaultPdfCopier extends AbstractPdfCopier {
     public DefaultPdfCopier(PdfReader reader, File outputFile, PdfVersion version) throws TaskException {
         try {
             outputStream = new FileOutputStream(outputFile);
-            open(reader, outputStream, version);
+            init(reader, outputStream, version);
         } catch (FileNotFoundException e) {
             throw new TaskException(String.format("Unable to find the output file %s", outputFile.getPath()), e);
         }

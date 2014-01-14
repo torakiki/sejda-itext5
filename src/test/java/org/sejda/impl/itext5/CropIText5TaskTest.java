@@ -76,6 +76,7 @@ public class CropIText5TaskTest extends BaseTaskTest {
     @Test
     public void testExecuteEncrypted() throws TaskException, IOException {
         parameters.setSource(getEncryptedSource());
+        parameters.setCompress(true);
         doExecute();
     }
 

@@ -54,7 +54,7 @@ abstract class AbstractPdfCopier implements PdfCopier {
     private int numberOfCopiedPages = 0;
 
     /**
-     * Opens the copier using the given reader and the given output version.
+     * initialize the copier using the given reader and the given output version.
      * 
      * @param reader
      * @param outputStream
@@ -62,7 +62,7 @@ abstract class AbstractPdfCopier implements PdfCopier {
      * @param version
      *            version for the created pdf copy, if null the version number is taken from the input {@link PdfReader}
      */
-    void open(PdfReader reader, OutputStream outputStream, PdfVersion version) throws TaskException {
+    void init(PdfReader reader, OutputStream outputStream, PdfVersion version) throws TaskException {
         try {
             pdfDocument = new Document(reader.getPageSizeWithRotation(1));
             pdfCopy = new PdfSmartCopy(pdfDocument, outputStream);
@@ -72,10 +72,13 @@ abstract class AbstractPdfCopier implements PdfCopier {
                 pdfCopy.setPdfVersion(version.getVersionAsCharacter());
             }
             pdfDocument.addCreator(Sejda.CREATOR);
-            pdfDocument.open();
         } catch (DocumentException e) {
             throw new TaskException("An error occurred opening the PdfSmartCopy.", e);
         }
+    }
+
+    public void open() {
+        pdfDocument.open();
     }
 
     public void addPage(PdfReader reader, int pageNumber, PdfRectangle cropBox) throws TaskException {
