@@ -1,5 +1,5 @@
 /*
- * Created on 14/gen/2014
+ * Created on 15/gen/2014
  * Copyright 2014 by Andrea Vacondio (andrea.vacondio@gmail.com).
  * This file is part of sejda-itext5.
  *
@@ -23,7 +23,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,48 +31,63 @@ import org.sejda.core.context.SejdaContext;
 import org.sejda.core.service.DefaultTaskExecutionService;
 import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
-import org.sejda.model.input.PdfMixInput;
-import org.sejda.model.input.PdfStreamSource;
-import org.sejda.model.parameter.AlternateMixParameters;
+import org.sejda.model.parameter.SetPagesLabelParameters;
 import org.sejda.model.pdf.PdfVersion;
+import org.sejda.model.pdf.label.PdfLabelNumberingStyle;
+import org.sejda.model.pdf.label.PdfPageLabel;
 import org.sejda.model.task.Task;
 
+import com.itextpdf.text.pdf.PdfPageLabels;
+import com.itextpdf.text.pdf.PdfPageLabels.PdfPageLabelFormat;
 import com.itextpdf.text.pdf.PdfReader;
 
 /**
  * @author Andrea Vacondio
- * 
+ *
  */
-public class AlternateMixIText5TaskTest extends BaseTaskTest {
+public class SetPageLabelIText5TaskTest extends BaseTaskTest {
     private DefaultTaskExecutionService victim = new DefaultTaskExecutionService();
     private SejdaContext context = mock(DefaultSejdaContext.class);
-    private AlternateMixParameters parameters;
-    private Task<AlternateMixParameters> victimTask = new AlternateMixTask();
+    private SetPagesLabelParameters parameters = new SetPagesLabelParameters();
+    private Task<SetPagesLabelParameters> victimTask = new SetPagesLabelTask();
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         TestUtils.setProperty(victim, "context", context);
-        InputStream firstStream = getClass().getClassLoader().getResourceAsStream("pdf/test_file.pdf");
-        PdfStreamSource firstSource = PdfStreamSource.newInstanceNoPassword(firstStream, "first_test_file.pdf");
-        PdfMixInput firstInput = new PdfMixInput(firstSource);
-        InputStream secondStream = getClass().getClassLoader().getResourceAsStream("pdf/test_file.pdf");
-        PdfStreamSource secondSource = PdfStreamSource.newInstanceNoPassword(secondStream, "first_test_file.pdf");
-        PdfMixInput secondInput = new PdfMixInput(secondSource, true, 3);
-        parameters = new AlternateMixParameters(firstInput, secondInput, "outName.pdf");
-        parameters.setOverwrite(true);
         parameters.setCompress(true);
         parameters.setVersion(PdfVersion.VERSION_1_6);
-        parameters.setOutput(getOutputFile());
+        parameters.setOverwrite(true);
+        parameters.putLabel(1, PdfPageLabel.newInstanceWithoutLabel(PdfLabelNumberingStyle.LOWERCASE_ROMANS, 1));
+        parameters.putLabel(3, PdfPageLabel.newInstanceWithLabel("Test", PdfLabelNumberingStyle.ARABIC, 1));
     }
 
     @Test
     public void testExecute() throws TaskException, IOException {
+        parameters.setSource(getSource());
+        doExecute();
+    }
+
+    @Test
+    public void testExecuteEncrypted() throws TaskException, IOException {
+        parameters.setSource(getEncryptedSource());
+        doExecute();
+    }
+
+    private void doExecute() throws TaskException, IOException {
+        parameters.setOutput(getOutputFile());
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         PdfReader reader = getReaderFromResultFile();
         assertCreator(reader);
         assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
-        assertEquals(8, reader.getNumberOfPages());
+        PdfPageLabelFormat[] formats = PdfPageLabels.getPageLabelFormats(reader);
+        assertEquals(1, formats[0].logicalPage);
+        assertEquals(1, formats[1].logicalPage);
+        assertEquals(1, formats[0].physicalPage);
+        assertEquals(3, formats[1].physicalPage);
+        assertEquals(PdfPageLabels.LOWERCASE_ROMAN_NUMERALS, formats[0].numberStyle);
+        assertEquals(PdfPageLabels.DECIMAL_ARABIC_NUMERALS, formats[1].numberStyle);
+        assertEquals("Test", formats[1].prefix);
         reader.close();
     }
 }

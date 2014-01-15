@@ -17,6 +17,7 @@
  * along with sejda-itext5.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.sejda.impl.itext5;
+
 import static org.sejda.common.ComponentsUtility.nullSafeCloseQuietly;
 import static org.sejda.core.notification.dsl.ApplicationEventsNotifier.notifyEvent;
 import static org.sejda.core.support.io.IOUtils.createTemporaryPdfBuffer;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import com.itextpdf.text.pdf.PdfEncryptor;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
+
 /**
  * Perform encryption of the input {@link PdfSource} list using input parameters.
  * 
