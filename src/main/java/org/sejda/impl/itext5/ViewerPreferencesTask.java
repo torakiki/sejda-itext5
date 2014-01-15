@@ -1,6 +1,5 @@
 /*
- * Created on 21/set/2010
- *
+ * Created on 15/gen/2014
  * Copyright 2014 by Andrea Vacondio (andrea.vacondio@gmail.com).
  * This file is part of sejda-itext5.
  *
