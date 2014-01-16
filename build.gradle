@@ -13,7 +13,7 @@ targetCompatibility = 1.5
 
 repositories {
     mavenLocal()
-    
+
     maven {  url "http://repo.maven.apache.org/maven2" }
 }
 
@@ -29,7 +29,8 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-all', version:'1.9.5'
     testCompile group: 'org.hibernate', name: 'hibernate-validator', version:'4.2.0.Final'
     testCompile group: 'jdepend', name: 'jdepend', version:'2.9.1'
-    
+    testCompile group: 'org.powermock', name: 'powermock-module-junit4', version:'1.5'
+    testCompile group: 'org.powermock', name: 'powermock-api-mockito', version:'1.5'
 }
 
 task sourcesJar(type: Jar, dependsOn:classes) {
@@ -73,7 +74,7 @@ uploadArchives {
                 description 'Sejda tasks implementation using iText 5.x'
                 url 'https://github.com/torakiki/event-studio/'
 
-                scm {						
+                scm {
                     url 'scm:git@github.com:torakiki/sejda-itext5.git'
                     connection 'scm:git@github.com:torakiki/sejda-itext5.git'
                     developerConnection 'scm:git@github.com:torakiki/sejda-itext5.git'
