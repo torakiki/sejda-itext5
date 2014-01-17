@@ -1,0 +1,177 @@
+/*
+ * Created on 17/gen/2014
+ * Copyright 2014 by Andrea Vacondio (andrea.vacondio@gmail.com).
+ * This file is part of sejda-itext5.
+ *
+ * sejda-itext5 is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * sejda-itext5 is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with sejda-itext5.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.sejda.impl.itext5.component.split;
+
+import static org.sejda.common.ComponentsUtility.nullSafeCloseQuietly;
+import static org.sejda.core.notification.dsl.ApplicationEventsNotifier.notifyEvent;
+import static org.sejda.core.support.io.IOUtils.createTemporaryPdfBuffer;
+import static org.sejda.core.support.io.model.FileOutput.file;
+import static org.sejda.core.support.prefix.NameGenerator.nameGenerator;
+import static org.sejda.core.support.prefix.model.NameGenerationRequest.nameRequest;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.sejda.core.support.io.MultipleOutputWriter;
+import org.sejda.core.support.io.OutputWriters;
+import org.sejda.core.support.prefix.model.NameGenerationRequest;
+import org.sejda.impl.itext5.component.ITextOutlineSubsetProvider;
+import org.sejda.impl.itext5.component.PdfCopier;
+import org.sejda.model.exception.TaskException;
+import org.sejda.model.exception.TaskExecutionException;
+import org.sejda.model.outline.OutlineSubsetProvider;
+import org.sejda.model.parameter.base.SinglePdfSourceMultipleOutputParameters;
+import org.sejda.model.pdf.PdfVersion;
+import org.sejda.model.task.NotifiableTaskMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.itextpdf.text.pdf.PdfReader;
+
+/**
+ * Abstract component providing a skeletal implementation of the split execution.
+ * 
+ * @author Andrea Vacondio
+ * @param <T>
+ *            the type of parameters the splitter needs to have all the information necessary to perform the split.
+ */
+abstract class AbstractPdfSplitter<T extends SinglePdfSourceMultipleOutputParameters> {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractPdfSplitter.class);
+
+    private PdfReader reader;
+    private T parameters;
+    private int totalPages;
+    private OutlineSubsetProvider<HashMap<String, Object>> outlineSubsetProvider;
+    private MultipleOutputWriter outputWriter;
+
+    /**
+     * Creates a new splitter using the given reader.
+     * 
+     * @param reader
+     */
+    AbstractPdfSplitter(PdfReader reader, T parameters) {
+        this.reader = reader;
+        this.parameters = parameters;
+        this.totalPages = reader.getNumberOfPages();
+        this.outlineSubsetProvider = new ITextOutlineSubsetProvider(reader);
+        this.outputWriter = OutputWriters.newMultipleOutputWriter(parameters.isOverwrite());
+    }
+
+    int getTotalNumberOfPages() {
+        return totalPages;
+    }
+
+    public void split(NotifiableTaskMetadata taskMetadata) throws TaskException {
+        nextOutputStrategy().ensureIsValid();
+        PdfCopier pdfCopier = null;
+        try {
+            int outputDocumentsCounter = 0;
+            for (int page = 1; page <= totalPages; page++) {
+                if (nextOutputStrategy().isOpening(page)) {
+                    LOG.debug("Starting split at page {} of the original document", page);
+                    outputDocumentsCounter++;
+                    pdfCopier = open(page, outputDocumentsCounter);
+                }
+                pdfCopier.addPage(reader, page);
+                notifyEvent(taskMetadata).stepsCompleted(page).outOf(totalPages);
+                if (nextOutputStrategy().isClosing(page) || page == totalPages) {
+                    LOG.trace("Adding bookmarks to the temporary buffer");
+                    pdfCopier.setOutline(new ArrayList<HashMap<String, Object>>(outlineSubsetProvider
+                            .getOutlineUntillPage(page)));
+                    nullSafeCloseQuietly(pdfCopier);
+                    LOG.debug("Ending split at page {} of the original document", page);
+                }
+            }
+        } finally {
+            nullSafeCloseQuietly(pdfCopier);
+        }
+        parameters.getOutput().accept(outputWriter);
+    }
+
+    private PdfCopier open(int page, int outputDocumentsCounter) throws TaskException {
+        File tmpFile = createTemporaryPdfBuffer();
+        LOG.debug("Created output temporary buffer {}", tmpFile);
+
+        PdfCopier pdfCopier = openCopier(reader, tmpFile, parameters.getVersion());
+        pdfCopier.setCompression(parameters.isCompress());
+        pdfCopier.open();
+
+        String outName = nameGenerator(parameters.getOutputPrefix()).generate(
+                enrichNameGenerationRequest(nameRequest().page(page).originalName(parameters.getSource().getName())
+                        .fileNumber(outputDocumentsCounter)));
+        outputWriter.addOutput(file(tmpFile).name(outName));
+        outlineSubsetProvider.startPage(page);
+        return pdfCopier;
+    }
+
+    /**
+     * @param request
+     * @return the input request enriched by an splitter extending class with specific values.
+     */
+    abstract NameGenerationRequest enrichNameGenerationRequest(NameGenerationRequest request);
+
+    abstract PdfCopier openCopier(PdfReader reader, File outputFile, PdfVersion version) throws TaskException;
+
+    /**
+     * @return the strategy to use to know if it's time to open a new document or close the current one.
+     */
+    abstract NextOutputStrategy nextOutputStrategy();
+
+    /**
+     * Sets the parameters to use during the split process. Parameters are mandatory to be able to perform the split.
+     * 
+     * @param parameters
+     */
+    void setParameters(T parameters) {
+        this.parameters = parameters;
+    }
+
+    /**
+     * Strategy used by the {@link AbstractPdfSplitter} to know when it's time to close the ongoing output and open a new one.
+     * 
+     * @author Andrea Vacondio
+     * 
+     */
+    interface NextOutputStrategy {
+
+        /**
+         * Ensures that the strategy implementation is in a valid state.
+         * 
+         * @throws TaskExecutionException
+         *             if not in a valid state.
+         */
+        void ensureIsValid() throws TaskExecutionException;
+
+        /**
+         * @param page
+         *            the current processing page
+         * @return true if the splitter should open a new output, false otherwise.
+         */
+        boolean isOpening(Integer page);
+
+        /**
+         * @param page
+         *            the current processing page
+         * @return true if the splitter should close the current output, false otherwise.
+         */
+        boolean isClosing(Integer page);
+    }
+}

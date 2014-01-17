@@ -23,11 +23,10 @@ import static org.apache.commons.io.FilenameUtils.removeExtension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sejda.impl.itext5.component.ITextOutlineSubsetProvider;
-import org.sejda.impl.itext5.util.ITextOutlineUtils;
+import org.sejda.impl.itext5.component.ITextOutlineUtils;
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.input.PdfMergeInput;
 import org.sejda.model.outline.OutlinePolicy;
@@ -49,7 +48,7 @@ class OutlineMerger {
     private static final Logger LOG = LoggerFactory.getLogger(OutlineMerger.class);
 
     private OutlinePolicy policy;
-    private List<Map<String, Object>> outline = new ArrayList<Map<String, Object>>();
+    private List<HashMap<String, Object>> outline = new ArrayList<HashMap<String, Object>>();
 
     OutlineMerger(OutlinePolicy policy) {
         this.policy = policy;
@@ -72,7 +71,7 @@ class OutlineMerger {
         String name = input.getSource().getName();
         if (StringUtils.isNotBlank(name)) {
             LOG.debug("Adding outline entry for {}", name);
-            Map<String, Object> current = new HashMap<String, Object>();
+            HashMap<String, Object> current = new HashMap<String, Object>();
             current.put(ITextOutlineUtils.TITLE_KEY, new PdfString(removeExtension(name)).toUnicodeString());
             current.put(ITextOutlineUtils.PAGE_KEY, Integer.toString(offset + 1));
             current.put(ITextOutlineUtils.ACTION_KEY, ITextOutlineUtils.GOTO_VALUE);
@@ -82,7 +81,7 @@ class OutlineMerger {
         }
     }
 
-    public List<Map<String, Object>> getOutline() {
+    public List<HashMap<String, Object>> getOutline() {
         return outline;
     }
 

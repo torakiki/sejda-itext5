@@ -68,6 +68,11 @@ class BaseTaskTest {
         return PdfStreamSource.newInstanceWithPassword(stream, "test_file.pdf", "test");
     }
 
+    PdfStreamSource getOutlineSource() {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("pdf/test_outline.pdf");
+        return PdfStreamSource.newInstanceNoPassword(stream, "test_outline.pdf");
+    }
+
     StreamTaskOutput getOutput() {
         return new StreamTaskOutput(out);
     }
@@ -96,5 +101,15 @@ class BaseTaskTest {
         reader.removeUnusedObjects();
         reader.consolidateNamedDestinations();
         return reader;
+    }
+
+    void assertOutputContainsDocuments(int expectedNumberOfDocuments) throws IOException {
+        ByteArrayInputStream input = new ByteArrayInputStream(out.toByteArray());
+        ZipInputStream zip = new ZipInputStream(input);
+        int counter = 0;
+        while (zip.getNextEntry() != null) {
+            counter++;
+        }
+        assertEquals(expectedNumberOfDocuments, counter);
     }
 }

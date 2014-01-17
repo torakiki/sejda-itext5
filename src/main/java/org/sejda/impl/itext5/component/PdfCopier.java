@@ -101,7 +101,6 @@ public interface PdfCopier extends Closeable {
      * 
      * @param outline
      */
-    // TODO investigate if it's still the case with iText5
     void setOutline(List<HashMap<String, Object>> outline);
 
     /**
@@ -109,4 +108,8 @@ public interface PdfCopier extends Closeable {
      */
     int getNumberOfCopiedPages();
 
+    /**
+     * Tells the copier to merge fields
+     */
+    void mergeFields();
 }

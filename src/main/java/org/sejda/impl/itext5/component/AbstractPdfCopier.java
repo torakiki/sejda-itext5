@@ -127,9 +127,14 @@ abstract class AbstractPdfCopier implements PdfCopier {
      * @throws TaskException
      */
     public void addAllPages(PdfReader reader) throws TaskException {
-        for (int i = 1; i <= reader.getNumberOfPages(); i++) {
-            addPage(reader, i);
+        try {
+            pdfCopy.addDocument(reader);
+        } catch (DocumentException e) {
+            throw new TaskIOException("An IO error occurred adding pages to the PdfSmartCopy.", e);
+        } catch (IOException e) {
+            throw new TaskIOException("An IO error occurred adding pages to the PdfSmartCopy.", e);
         }
+        numberOfCopiedPages += reader.getNumberOfPages();
     }
 
     public void setCompression(boolean compress) throws TaskException {
