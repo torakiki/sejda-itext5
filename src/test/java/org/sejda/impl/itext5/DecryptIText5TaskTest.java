@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.junit.Before;
@@ -32,7 +31,6 @@ import org.sejda.core.context.SejdaContext;
 import org.sejda.core.service.DefaultTaskExecutionService;
 import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
-import org.sejda.model.output.DirectoryTaskOutput;
 import org.sejda.model.parameter.DecryptParameters;
 import org.sejda.model.pdf.PdfVersion;
 import org.sejda.model.task.Task;
@@ -56,8 +54,8 @@ public class DecryptIText5TaskTest extends BaseTaskTest {
         parameters.setCompress(true);
         parameters.setVersion(PdfVersion.VERSION_1_6);
         parameters.setOverwrite(true);
-        // TODO
-        parameters.setOutput(new DirectoryTaskOutput(new File("/tmp")));
+        parameters.addSource(getEncryptedSource());
+        parameters.setOutput(getOutput());
     }
 
     @Test
@@ -68,6 +66,8 @@ public class DecryptIText5TaskTest extends BaseTaskTest {
         PdfReader reader = getReaderFromResultStream("test_file.pdf");
         assertCreator(reader);
         assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
+        // TODO
+        // assertFalse(reader.isEncrypted());
         reader.close();
     }
 
