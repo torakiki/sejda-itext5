@@ -82,10 +82,10 @@ uploadArchives {
 
                 licenses {
                     license {
-                        name 'GNU General Public License (GPL), Version 3.0'
-                        url 'http://www.gnu.org/licenses/gpl-3.0.html'
+                        name 'GNU Afferp General Public License (AGPL), Version 3.0'
+                        url 'http://www.gnu.org/licenses/agpl-3.0.html'
                         distribution 'repo'
-                        comments 'GPLv3'
+                        comments 'AGPLv3'
                     }
                 }
 
