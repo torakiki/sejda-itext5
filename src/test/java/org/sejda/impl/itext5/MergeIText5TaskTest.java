@@ -27,7 +27,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sejda.core.context.DefaultSejdaContext;
 import org.sejda.core.context.SejdaContext;
@@ -148,8 +147,6 @@ public class MergeIText5TaskTest extends BaseTaskTest {
     }
 
     @Test
-    @Ignore
-    // TODO investigate merge fields
     public void executeMergeAllWithEncryptedOnePerDocCopyFields() throws TaskException, IOException {
         inputWithEncrypted();
         TestUtils.setProperty(parameters, "copyFormFields", Boolean.TRUE);
@@ -158,8 +155,6 @@ public class MergeIText5TaskTest extends BaseTaskTest {
     }
 
     @Test
-    @Ignore
-    // TODO investigate merge fields
     public void executeMergeAllWithOutlineDiscardingOutlineCopyFields() throws TaskException, IOException {
         inputWithOutline();
         TestUtils.setProperty(parameters, "copyFormFields", Boolean.TRUE);
@@ -168,8 +163,6 @@ public class MergeIText5TaskTest extends BaseTaskTest {
     }
 
     @Test
-    @Ignore
-    // TODO investigate merge fields
     public void executeMergeAllDiscardingOutlineCopyFields() throws TaskException, IOException {
         input();
         TestUtils.setProperty(parameters, "copyFormFields", Boolean.TRUE);
