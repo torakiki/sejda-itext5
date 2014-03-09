@@ -40,10 +40,10 @@ import com.itextpdf.text.pdf.RandomAccessFileOrArray;
  * 
  */
 public class DefaultPdfSourceOpener implements PdfSourceOpener<PdfReader> {
-
+    public static final String UNETHICAL_PROPERTY_NAME = "org.sejda.impl.itext.unethicalread";
     private static final RandomAccessSourceFactory FACTORY = new RandomAccessSourceFactory();
     static {
-        PdfReader.unethicalreading = true;
+        PdfReader.unethicalreading = Boolean.getBoolean(UNETHICAL_PROPERTY_NAME);
     }
 
     public PdfReader open(PdfURLSource source) throws TaskIOException {
