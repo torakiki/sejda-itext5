@@ -73,6 +73,16 @@ class BaseTaskTest {
         return PdfStreamSource.newInstanceNoPassword(stream, "test_outline.pdf");
     }
 
+    PdfStreamSource getEncryptedEmptyPwd() {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("pdf/enc_empty_pwd.pdf");
+        return PdfStreamSource.newInstanceWithPassword(stream, "test_file.pdf", "");
+    }
+
+    PdfStreamSource getEncryptedSameUserAndOwnerPwd() {
+        InputStream stream = getClass().getClassLoader().getResourceAsStream("pdf/enc_usr_own_same_pwd.pdf");
+        return PdfStreamSource.newInstanceWithPassword(stream, "test_file.pdf", "test");
+    }
+
     StreamTaskOutput getOutput() {
         return new StreamTaskOutput(out);
     }

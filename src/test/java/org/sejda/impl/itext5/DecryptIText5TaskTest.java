@@ -19,6 +19,7 @@
 package org.sejda.impl.itext5;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +40,7 @@ import com.itextpdf.text.pdf.PdfReader;
 
 /**
  * @author Andrea Vacondio
- *
+ * 
  */
 public class DecryptIText5TaskTest extends BaseTaskTest {
 
@@ -54,20 +55,34 @@ public class DecryptIText5TaskTest extends BaseTaskTest {
         parameters.setCompress(true);
         parameters.setVersion(PdfVersion.VERSION_1_6);
         parameters.setOverwrite(true);
-        parameters.addSource(getEncryptedSource());
         parameters.setOutput(getOutput());
     }
 
     @Test
     public void testExecuteEncrypted() throws TaskException, IOException {
         parameters.addSource(getEncryptedSource());
+        doExecute();
+    }
+
+    @Test
+    public void testExecuteEncryptedEmptyPwd() throws TaskException, IOException {
+        parameters.addSource(getEncryptedEmptyPwd());
+        doExecute();
+    }
+
+    @Test
+    public void testExecuteEncryptedSameUserAndOwner() throws TaskException, IOException {
+        parameters.addSource(getEncryptedSameUserAndOwnerPwd());
+        doExecute();
+    }
+
+    private void doExecute() throws TaskException, IOException {
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         PdfReader reader = getReaderFromResultStream("test_file.pdf");
         assertCreator(reader);
         assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
-        // TODO
-        // assertFalse(reader.isEncrypted());
+        assertFalse(reader.isEncrypted());
         reader.close();
     }
 
