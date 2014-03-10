@@ -20,6 +20,7 @@ package org.sejda.impl.itext5.component;
 
 import java.io.IOException;
 
+import org.sejda.core.Sejda;
 import org.sejda.model.exception.TaskIOException;
 import org.sejda.model.exception.TaskWrongPasswordException;
 import org.sejda.model.input.PdfFileSource;
@@ -40,10 +41,9 @@ import com.itextpdf.text.pdf.RandomAccessFileOrArray;
  * 
  */
 public class DefaultPdfSourceOpener implements PdfSourceOpener<PdfReader> {
-    public static final String UNETHICAL_PROPERTY_NAME = "org.sejda.impl.itext.unethicalread";
     private static final RandomAccessSourceFactory FACTORY = new RandomAccessSourceFactory();
     static {
-        PdfReader.unethicalreading = Boolean.getBoolean(UNETHICAL_PROPERTY_NAME);
+        PdfReader.unethicalreading = Boolean.getBoolean(Sejda.UNETHICAL_READ_PROPERTY_NAME);
     }
 
     public PdfReader open(PdfURLSource source) throws TaskIOException {
