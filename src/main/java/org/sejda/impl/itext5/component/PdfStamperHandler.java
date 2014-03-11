@@ -18,6 +18,7 @@
  */
 package org.sejda.impl.itext5.component;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.sejda.impl.itext5.util.TransitionUtils.getTransition;
 
 import java.io.Closeable;
@@ -149,7 +150,12 @@ public final class PdfStamperHandler implements Closeable {
     public void setEncryption(int encryptionType, String userPassword, String ownerPassword, int permissions)
             throws TaskException {
         try {
-            stamper.setEncryption(encryptionType, userPassword, ownerPassword, permissions);
+            if (isBlank(ownerPassword)) {
+                LOG.warn("Owner password not specified, using the user password as per Pdf reference 1.7, Chap. 3.5.2, Algorithm 3.3, Step 1.");
+                stamper.setEncryption(encryptionType, userPassword, userPassword, permissions);
+            } else {
+                stamper.setEncryption(encryptionType, userPassword, ownerPassword, permissions);
+            }
         } catch (DocumentException e) {
             throw new TaskException("An error occured while setting encryption on the document", e);
         }
