@@ -73,12 +73,8 @@ public class ExtractPagesIText5TaskTest extends BaseTaskTest {
     }
 
     private void setUpParametersPageRangesPages() {
-        PageRange ristRange = new PageRange(1, 1);
-        PageRange secondRange = new PageRange(3);
-        Set<PageRange> ranges = new HashSet<PageRange>();
-        ranges.add(ristRange);
-        ranges.add(secondRange);
-        parameters.addPredefinedSetOfPages(ranges);
+        parameters.addPageRange(new PageRange(1, 1));
+        parameters.addPageRange(new PageRange(3));
         parameters.setSource(getSource());
     }
 
@@ -92,7 +88,7 @@ public class ExtractPagesIText5TaskTest extends BaseTaskTest {
         ranges.add(secondRange);
         ranges.add(thirdRange);
         ranges.add(fourthRange);
-        parameters.addPredefinedSetOfPages(ranges);
+        parameters.addAllPageRanges(ranges);
         parameters.setSource(getMediumSource());
     }
 
