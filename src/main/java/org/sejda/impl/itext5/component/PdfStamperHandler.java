@@ -95,7 +95,6 @@ public final class PdfStamperHandler implements Closeable {
      * 
      * @param compress
      * @throws TaskException
-     * @throws DocumentException
      */
     public void setCompression(boolean compress, PdfReader reader) throws TaskException {
         if (compress) {
