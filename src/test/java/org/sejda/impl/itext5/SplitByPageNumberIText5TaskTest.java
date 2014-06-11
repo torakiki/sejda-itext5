@@ -30,13 +30,14 @@ import org.sejda.core.context.SejdaContext;
 import org.sejda.core.service.DefaultTaskExecutionService;
 import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
+import org.sejda.model.input.PdfStreamSource;
 import org.sejda.model.parameter.SplitByPagesParameters;
 import org.sejda.model.pdf.PdfVersion;
 import org.sejda.model.task.Task;
 
 /**
  * @author Andrea Vacondio
- *
+ * 
  */
 public class SplitByPageNumberIText5TaskTest extends BaseTaskTest {
     private DefaultTaskExecutionService victim = new DefaultTaskExecutionService();
@@ -54,8 +55,30 @@ public class SplitByPageNumberIText5TaskTest extends BaseTaskTest {
         parameters.setOutput(getOutput());
     }
 
+    private PdfStreamSource getPdfSource() {
+        return PdfStreamSource.newInstanceNoPassword(
+                getClass().getClassLoader().getResourceAsStream("pdf/test_file.pdf"), "test_file.pdf");
+    }
+
+    private PdfStreamSource getEncPdfSource() {
+        return PdfStreamSource.newInstanceWithPassword(
+                getClass().getClassLoader().getResourceAsStream("pdf/enc_with_modify_perm.pdf"),
+                "enc_with_modify_perm.pdf", "test");
+    }
+
     @Test
-    public void testExecuteBurst() throws TaskException, IOException {
+    public void burst() throws TaskException, IOException {
+        parameters.setSource(getPdfSource());
+        doTestBurst();
+    }
+
+    @Test
+    public void burstEnc() throws TaskException, IOException {
+        parameters.setSource(getEncPdfSource());
+        doTestBurst();
+    }
+
+    public void doTestBurst() throws TaskException, IOException {
         parameters.addPage(1);
         parameters.addPage(2);
         parameters.addPage(3);
@@ -66,20 +89,53 @@ public class SplitByPageNumberIText5TaskTest extends BaseTaskTest {
     }
 
     @Test
-    public void testExecuteEven() throws TaskException, IOException {
+    public void even() throws TaskException, IOException {
+        parameters.setSource(getPdfSource());
+        doTestEven();
+    }
+
+    @Test
+    public void evenEnc() throws TaskException, IOException {
+        parameters.setSource(getEncPdfSource());
+        doTestEven();
+    }
+
+    public void doTestEven() throws TaskException, IOException {
         parameters.addPage(2);
         parameters.addPage(4);
+        when(context.getTask(parameters)).thenReturn((Task) victimTask);
+        victim.execute(parameters);
+        assertOutputContainsDocuments(2);
+    }
+
+    @Test
+    public void odd() throws TaskException, IOException {
+        parameters.setSource(getPdfSource());
+        doTestOdd();
+    }
+
+    @Test
+    public void oddEnc() throws TaskException, IOException {
+        parameters.setSource(getEncPdfSource());
+        doTestOdd();
+    }
+
+    public void doTestOdd() throws TaskException, IOException {
+        parameters.addPage(1);
+        parameters.addPage(3);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         assertOutputContainsDocuments(3);
     }
 
     @Test
-    public void testExecuteOdd() throws TaskException, IOException {
+    public void splitHalf() throws TaskException, IOException {
+        parameters.setSource(PdfStreamSource.newInstanceNoPassword(
+                getClass().getClassLoader().getResourceAsStream("pdf/2_pages.pdf"), "2_pages.pdf"));
         parameters.addPage(1);
-        parameters.addPage(3);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         assertOutputContainsDocuments(2);
     }
+
 }

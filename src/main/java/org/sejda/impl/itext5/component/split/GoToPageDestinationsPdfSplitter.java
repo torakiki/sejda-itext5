@@ -27,6 +27,8 @@ import org.sejda.model.exception.TaskException;
 import org.sejda.model.outline.OutlineGoToPageDestinations;
 import org.sejda.model.parameter.SplitByGoToActionLevelParameters;
 import org.sejda.model.pdf.PdfVersion;
+import org.sejda.model.split.GoToPageDestinationsSplitPages;
+import org.sejda.model.split.NextOutputStrategy;
 
 import com.itextpdf.text.pdf.PdfReader;
 
@@ -38,7 +40,7 @@ import com.itextpdf.text.pdf.PdfReader;
  */
 public class GoToPageDestinationsPdfSplitter extends AbstractPdfSplitter<SplitByGoToActionLevelParameters> {
 
-    private SplitPages splitPages;
+    private GoToPageDestinationsSplitPages splitPages;
     private OutlineGoToPageDestinations outlineDestinations;
 
     /**
@@ -52,7 +54,7 @@ public class GoToPageDestinationsPdfSplitter extends AbstractPdfSplitter<SplitBy
     public GoToPageDestinationsPdfSplitter(PdfReader reader, SplitByGoToActionLevelParameters parameters,
             OutlineGoToPageDestinations outlineDestinations) {
         super(reader, parameters);
-        this.splitPages = new SplitPages(outlineDestinations.getPages());
+        this.splitPages = new GoToPageDestinationsSplitPages(outlineDestinations);
         this.outlineDestinations = outlineDestinations;
     }
 

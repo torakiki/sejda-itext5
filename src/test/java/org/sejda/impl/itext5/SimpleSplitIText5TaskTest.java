@@ -76,7 +76,7 @@ public class SimpleSplitIText5TaskTest extends BaseTaskTest {
         setUpParameters(PredefinedSetOfPages.EVEN_PAGES);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
-        assertOutputContainsDocuments(3);
+        assertOutputContainsDocuments(2);
     }
 
     @Test
@@ -84,6 +84,6 @@ public class SimpleSplitIText5TaskTest extends BaseTaskTest {
         setUpParameters(PredefinedSetOfPages.ODD_PAGES);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
-        assertOutputContainsDocuments(2);
+        assertOutputContainsDocuments(3);
     }
 }
