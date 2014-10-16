@@ -52,6 +52,7 @@ abstract class AbstractPdfCopier implements PdfCopier {
     private Document pdfDocument = null;
     private boolean closed = false;
     private int numberOfCopiedPages = 0;
+    public boolean mergeFields = false;
 
     /**
      * initialize the copier using the given reader and the given output version.
@@ -150,7 +151,9 @@ abstract class AbstractPdfCopier implements PdfCopier {
 
     public void freeReader(PdfReader reader) throws TaskIOException {
         try {
-            pdfCopy.freeReader(reader);
+            if (!mergeFields) {
+                pdfCopy.freeReader(reader);
+            }
         } catch (IOException e) {
             throw new TaskIOException("An IO error occurred freeing the pdf reader.", e);
         }
@@ -188,6 +191,7 @@ abstract class AbstractPdfCopier implements PdfCopier {
      * Tells the copier to merge fields
      */
     public void mergeFields() {
+        this.mergeFields = true;
         pdfCopy.setMergeFields();
     }
 }
