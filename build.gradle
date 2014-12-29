@@ -17,6 +17,11 @@ repositories {
     maven {  url "https://oss.sonatype.org/content/repositories/snapshots/" }
 }
 
+configurations.all {
+    //this allows jdk5
+    resolutionStrategy { force 'org.javassist:javassist:3.16.1-GA' }
+}
+
 dependencies {
     compile group: 'org.sejda', name: 'sejda-model', version: '1.0.0.RELEASE-SNAPSHOT'
     compile group: 'org.sejda', name: 'sejda-core', version: '1.0.0.RELEASE-SNAPSHOT'
@@ -67,7 +72,7 @@ uploadArchives {
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
             }
-            
+
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
                 authentication(userName: sonatypeUsername, password: sonatypePassword)
             }
