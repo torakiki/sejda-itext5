@@ -60,7 +60,7 @@ public class EncryptTask extends BaseTask<EncryptParameters> {
     private PdfReader reader = null;
     private PdfStamperHandler stamperHandler = null;
     private int totalSteps;
-    private int permissions = PdfWriter.DO_NOT_ENCRYPT_METADATA;
+    private int permissions;
     private MultipleOutputWriter outputWriter;
     private PdfSourceOpener<PdfReader> sourceOpener;
 
@@ -84,8 +84,9 @@ public class EncryptTask extends BaseTask<EncryptParameters> {
             LOG.debug("Created output temporary buffer {} ", tmpFile);
             stamperHandler = new PdfStamperHandler(reader, tmpFile, parameters.getVersion());
             stamperHandler.setCompression(parameters.isCompress(), reader);
-            stamperHandler.setEncryption(getEncryptionAlgorithm(parameters.getEncryptionAlgorithm()),
-                    parameters.getUserPassword(), parameters.getOwnerPassword(), permissions);
+            stamperHandler.setEncryption(getEncryptionAlgorithm(parameters.getEncryptionAlgorithm())
+                    | PdfWriter.DO_NOT_ENCRYPT_METADATA, parameters.getUserPassword(), parameters.getOwnerPassword(),
+                    permissions);
 
             nullSafeCloseQuietly(stamperHandler);
             nullSafeClosePdfReader(reader);
