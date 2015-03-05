@@ -87,7 +87,7 @@ class OutlineMerger {
 
     private void updateRetainingOutline(PdfReader reader, PdfMergeInput input, int offset) throws TaskException {
         LOG.debug("Retaining outline");
-        OutlineSubsetProvider<HashMap<String, Object>> outlineProvider = new ITextOutlineSubsetProvider(reader);
+        OutlineSubsetProvider<List<HashMap<String, Object>>> outlineProvider = new ITextOutlineSubsetProvider(reader);
         if (input.isAllPages()) {
             LOG.trace("Adding complete outline");
             outline.addAll(outlineProvider.getOutlineWithOffset(offset));

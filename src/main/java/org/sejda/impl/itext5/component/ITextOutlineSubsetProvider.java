@@ -19,7 +19,6 @@
 package org.sejda.impl.itext5.component;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +37,7 @@ import com.itextpdf.text.pdf.SimpleBookmark;
  * @author Andrea Vacondio
  * 
  */
-public class ITextOutlineSubsetProvider implements OutlineSubsetProvider<HashMap<String, Object>> {
+public class ITextOutlineSubsetProvider implements OutlineSubsetProvider<List<HashMap<String, Object>>> {
     private int totalNumberOfPages;
     private List<HashMap<String, Object>> bookmarks;
     private int startPage = -1;
@@ -64,11 +63,11 @@ public class ITextOutlineSubsetProvider implements OutlineSubsetProvider<HashMap
         this.startPage = startPage;
     }
 
-    public Collection<HashMap<String, Object>> getOutlineUntillPage(int endPage) throws TaskException {
+    public List<HashMap<String, Object>> getOutlineUntillPage(int endPage) throws TaskException {
         return getOutlineUntillPageWithOffset(endPage, 0);
     }
 
-    public Collection<HashMap<String, Object>> getOutlineWithOffset(int offset) {
+    public List<HashMap<String, Object>> getOutlineWithOffset(int offset) {
         List<HashMap<String, Object>> books = getDeepCopyBookmarks(bookmarks);
         if (offset != 0) {
             SimpleBookmark.shiftPageNumbers(books, offset, null);
@@ -76,7 +75,7 @@ public class ITextOutlineSubsetProvider implements OutlineSubsetProvider<HashMap
         return books;
     }
 
-    public Collection<HashMap<String, Object>> getOutlineUntillPageWithOffset(int endPage, int offset)
+    public List<HashMap<String, Object>> getOutlineUntillPageWithOffset(int endPage, int offset)
             throws TaskException {
         if (startPage < 0 || startPage > endPage) {
             throw new TaskException(

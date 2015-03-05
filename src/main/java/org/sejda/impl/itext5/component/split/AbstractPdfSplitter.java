@@ -28,6 +28,7 @@ import static org.sejda.core.support.prefix.model.NameGenerationRequest.nameRequ
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.sejda.core.support.io.MultipleOutputWriter;
 import org.sejda.core.support.io.OutputWriters;
@@ -59,7 +60,7 @@ abstract class AbstractPdfSplitter<T extends SinglePdfSourceMultipleOutputParame
     private PdfReader reader;
     private T parameters;
     private int totalPages;
-    private OutlineSubsetProvider<HashMap<String, Object>> outlineSubsetProvider;
+    private OutlineSubsetProvider<List<HashMap<String, Object>>> outlineSubsetProvider;
     private MultipleOutputWriter outputWriter;
 
     /**
