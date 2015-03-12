@@ -34,7 +34,7 @@ import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.notification.EventListener;
 import org.sejda.model.notification.event.TaskExecutionFailedEvent;
-import org.sejda.model.parameter.SplitByGoToActionLevelParameters;
+import org.sejda.model.parameter.SplitByOutlineLevelParameters;
 import org.sejda.model.pdf.PdfVersion;
 import org.sejda.model.task.Task;
 
@@ -42,19 +42,19 @@ import org.sejda.model.task.Task;
  * @author Andrea Vacondio
  *
  */
-public class SplitByGoToActionLevelIText5TaskTest extends BaseTaskTest {
+public class SplitByOutlineLevelIText5TaskTest extends BaseTaskTest {
 
     private DefaultTaskExecutionService victim = new DefaultTaskExecutionService();
     private SejdaContext context = mock(DefaultSejdaContext.class);
-    private Task<SplitByGoToActionLevelParameters> victimTask = new SplitByGoToActionLevelTask();
+    private Task<SplitByOutlineLevelParameters> victimTask = new SplitByOutlineLevelTask();
 
     @Before
     public void setUp() {
         TestUtils.setProperty(victim, "context", context);
     }
 
-    private SplitByGoToActionLevelParameters setUpParameters(int level, String regEx) {
-        SplitByGoToActionLevelParameters parameters = new SplitByGoToActionLevelParameters(level);
+    private SplitByOutlineLevelParameters setUpParameters(int level, String regEx) {
+        SplitByOutlineLevelParameters parameters = new SplitByOutlineLevelParameters(level);
         parameters.setMatchingTitleRegEx(regEx);
         parameters.setCompress(true);
         parameters.setVersion(PdfVersion.VERSION_1_6);
@@ -66,7 +66,7 @@ public class SplitByGoToActionLevelIText5TaskTest extends BaseTaskTest {
 
     @Test
     public void testExecuteLevel3() throws TaskException, IOException {
-        SplitByGoToActionLevelParameters parameters = setUpParameters(3, null);
+        SplitByOutlineLevelParameters parameters = setUpParameters(3, null);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         assertOutputContainsDocuments(2);
@@ -74,7 +74,7 @@ public class SplitByGoToActionLevelIText5TaskTest extends BaseTaskTest {
 
     @Test
     public void testExecuteLevel2() throws TaskException, IOException {
-        SplitByGoToActionLevelParameters parameters = setUpParameters(2, null);
+        SplitByOutlineLevelParameters parameters = setUpParameters(2, null);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         assertOutputContainsDocuments(3);
@@ -82,7 +82,7 @@ public class SplitByGoToActionLevelIText5TaskTest extends BaseTaskTest {
 
     @Test
     public void testExecuteLevel2MatchingregEx() throws TaskException, IOException {
-        SplitByGoToActionLevelParameters parameters = setUpParameters(2, ".+(page)+.+");
+        SplitByOutlineLevelParameters parameters = setUpParameters(2, ".+(page)+.+");
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         victim.execute(parameters);
         assertOutputContainsDocuments(2);
@@ -90,7 +90,7 @@ public class SplitByGoToActionLevelIText5TaskTest extends BaseTaskTest {
 
     @Test
     public void testExecuteLevel4() throws TaskException {
-        SplitByGoToActionLevelParameters parameters = setUpParameters(4, null);
+        SplitByOutlineLevelParameters parameters = setUpParameters(4, null);
         when(context.getTask(parameters)).thenReturn((Task) victimTask);
         TestListenerFailed failListener = new TestListenerFailed();
         ThreadLocalNotificationContext.getContext().addListener(failListener);

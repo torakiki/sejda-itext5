@@ -21,12 +21,12 @@ package org.sejda.impl.itext5;
 import static org.sejda.impl.itext5.util.ITextUtils.nullSafeClosePdfReader;
 
 import org.sejda.impl.itext5.component.DefaultPdfSourceOpener;
-import org.sejda.impl.itext5.component.ITextOutlineHandler;
-import org.sejda.impl.itext5.component.split.GoToPageDestinationsPdfSplitter;
+import org.sejda.impl.itext5.component.ITextOutlineLevelsHandler;
+import org.sejda.impl.itext5.component.split.PageDestinationsLevelPdfSplitter;
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.input.PdfSourceOpener;
-import org.sejda.model.outline.OutlineGoToPageDestinations;
-import org.sejda.model.parameter.SplitByGoToActionLevelParameters;
+import org.sejda.model.outline.OutlinePageDestinations;
+import org.sejda.model.parameter.SplitByOutlineLevelParameters;
 import org.sejda.model.task.BaseTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,32 +34,31 @@ import org.slf4j.LoggerFactory;
 import com.itextpdf.text.pdf.PdfReader;
 
 /**
- * Task splitting an input pdf document on a set of pages given by a GoTo Action level defined in the input parameter.
+ * Task splitting an input pdf document on a set of pages given by an outline level defined in the input parameter.
  * 
  * @author Andrea Vacondio
  * 
  */
-public class SplitByGoToActionLevelTask extends BaseTask<SplitByGoToActionLevelParameters> {
+public class SplitByOutlineLevelTask extends BaseTask<SplitByOutlineLevelParameters> {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SplitByGoToActionLevelTask.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SplitByOutlineLevelTask.class);
 
     private PdfReader reader = null;
     private PdfSourceOpener<PdfReader> sourceOpener;
-    private GoToPageDestinationsPdfSplitter splitter;
+    private PageDestinationsLevelPdfSplitter splitter;
 
-    public void before(SplitByGoToActionLevelParameters parameters) {
+    public void before(SplitByOutlineLevelParameters parameters) {
         sourceOpener = new DefaultPdfSourceOpener();
     }
 
-    public void execute(SplitByGoToActionLevelParameters parameters) throws TaskException {
+    public void execute(SplitByOutlineLevelParameters parameters) throws TaskException {
         LOG.debug("Opening {} ", parameters.getSource());
         reader = parameters.getSource().open(sourceOpener);
 
         LOG.debug("Retrieving outline information for level {}", parameters.getLevelToSplitAt());
-        OutlineGoToPageDestinations goToPagesDestination = new ITextOutlineHandler(reader,
-                parameters.getMatchingTitleRegEx())
-                .getGoToPageDestinationForActionLevel(parameters.getLevelToSplitAt());
-        splitter = new GoToPageDestinationsPdfSplitter(reader, parameters, goToPagesDestination);
+        OutlinePageDestinations goToPagesDestination = new ITextOutlineLevelsHandler(reader,
+                parameters.getMatchingTitleRegEx()).getPageDestinationsForLevel(parameters.getLevelToSplitAt());
+        splitter = new PageDestinationsLevelPdfSplitter(reader, parameters, goToPagesDestination);
         LOG.debug("Starting split by GoTo Action level for {} ", parameters);
         splitter.split(getNotifiableTaskMetadata());
 
