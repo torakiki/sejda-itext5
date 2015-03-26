@@ -33,9 +33,9 @@ import org.sejda.impl.TestUtils;
 import org.sejda.model.exception.TaskException;
 import org.sejda.model.parameter.RotateParameters;
 import org.sejda.model.pdf.PdfVersion;
-import org.sejda.model.rotation.PageRotation;
+import org.sejda.model.pdf.page.PageRange;
+import org.sejda.model.pdf.page.PredefinedSetOfPages;
 import org.sejda.model.rotation.Rotation;
-import org.sejda.model.rotation.RotationType;
 import org.sejda.model.task.Task;
 
 import com.itextpdf.text.pdf.PdfReader;
@@ -50,13 +50,15 @@ public class RotateIText5TaskTest extends BaseTaskTest {
 
     private DefaultTaskExecutionService victim = new DefaultTaskExecutionService();
     private SejdaContext context = mock(DefaultSejdaContext.class);
-    private RotateParameters parameters = new RotateParameters(PageRotation.createMultiplePagesRotation(
-            Rotation.DEGREES_180, RotationType.ALL_PAGES));
+    private RotateParameters parameters;
     private Task<RotateParameters> victimTask = new RotateTask();
 
     @Before
     public void setUp() throws SecurityException, IllegalArgumentException {
         TestUtils.setProperty(victim, "context", context);
+    }
+
+    private void setUpParameters() {
         parameters.setCompress(true);
         parameters.setOutputPrefix("test_prefix_");
         parameters.setVersion(PdfVersion.VERSION_1_6);
@@ -64,27 +66,52 @@ public class RotateIText5TaskTest extends BaseTaskTest {
         parameters.setOutput(getOutput());
     }
 
-
     @Test
     public void testExecute() throws TaskException, IOException {
+        parameters = new RotateParameters(Rotation.DEGREES_180, PredefinedSetOfPages.ALL_PAGES);
+        setUpParameters();
         parameters.addSource(getSource());
         doExecute();
-    }
 
-    @Test
-    public void testExecuteEncrypted() throws TaskException, IOException {
-        parameters.addSource(getEncryptedSource());
-        doExecute();
-    }
-
-    private void doExecute() throws TaskException, IOException {
-        when(context.getTask(parameters)).thenReturn((Task) victimTask);
-        victim.execute(parameters);
         PdfReader reader = getReaderFromResultStream("test_prefix_test_file.pdf");
         assertCreator(reader);
         assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
         assertEquals(4, reader.getNumberOfPages());
         assertEquals(180, reader.getPageRotation(2));
         reader.close();
+    }
+
+    @Test
+    public void testExecuteEncrypted() throws TaskException, IOException {
+        parameters = new RotateParameters(Rotation.DEGREES_180, PredefinedSetOfPages.ALL_PAGES);
+        setUpParameters();
+        parameters.addSource(getEncryptedSource());
+        doExecute();
+
+        PdfReader reader = getReaderFromResultStream("test_prefix_test_file.pdf");
+        assertCreator(reader);
+        assertEquals(PdfVersion.VERSION_1_6.getVersionAsCharacter(), reader.getPdfVersion());
+        assertEquals(4, reader.getNumberOfPages());
+        assertEquals(180, reader.getPageRotation(2));
+        reader.close();
+    }
+
+    @Test
+    public void testRotateSpecificPages() throws TaskException, IOException {
+        parameters = new RotateParameters(Rotation.DEGREES_90);
+        setUpParameters();
+        parameters.addPageRange(new PageRange(2, 4));
+        parameters.addSource(getSource());
+        doExecute();
+
+        PdfReader reader = getReaderFromResultStream("test_prefix_test_file.pdf");
+        assertEquals(90, reader.getPageRotation(3));
+        reader.close();
+    }
+
+    private void doExecute() throws TaskException {
+        when(context.getTask(parameters)).thenReturn((Task) victimTask);
+        victim.execute(parameters);
+
     }
 }
