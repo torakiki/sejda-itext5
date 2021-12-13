@@ -1,3 +1,5 @@
+**This repository is archived and won't receive any update**
+
 sejda-itext5
 ============
 Implementation of some of the tasks available in Sejda (http://www.sejda.org) using version 5.x of iText (http://itextpdf.com/).
